@@ -1,42 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import TaskCard from '../components/TaskCard';
 import { toast } from 'react-toastify';
+import TaskCard from '../components/TaskCard';
 
 const Project = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
-  const [newTask, setNewTask] = useState({ title: '', description: '', status: 'todo' });
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [status, setStatus] = useState('todo');
+
+  // Use Vite environment variable for API URL
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await axios.get(`http://localhost:5000/api/projects/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const headers = { Authorization: `Bearer ${token}` };
+        const res = await axios.get(`${API_URL}/api/projects/${id}`, { headers });
         setProject(res.data);
       } catch (err) {
         console.error('Fetch project error:', err);
-        toast.error('Failed to fetch project');
+        toast.error('Failed to load project');
+        navigate('/');
       }
     };
     fetchProject();
-  }, [id]);
+  }, [id, navigate, token]);
 
   const handleAddTask = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
       const res = await axios.post(
-        `http://localhost:5000/api/projects/${id}/tasks`,
-        newTask,
-        { headers: { Authorization: `Bearer ${token}` } }
+        `${API_URL}/api/projects/${id}/tasks`,
+        { title, description, status },
+        { headers }
       );
       setProject({ ...project, tasks: [...project.tasks, res.data] });
-      setNewTask({ title: '', description: '', status: 'todo' });
+      setTitle('');
+      setDescription('');
+      setStatus('todo');
       toast.success('Task added successfully!');
     } catch (err) {
       console.error('Add task error:', err);
@@ -44,44 +52,53 @@ const Project = () => {
     }
   };
 
-  if (!project) return <div className="text-center text-gray-600">Loading...</div>;
+  if (!project) return <div className="text-center text-white">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 p-6">
+    <div className="min-h-screen bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-6">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-            {project.name}
-          </h1>
-          <button
-            onClick={() => navigate('/')}
-            className="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-6 py-2 rounded-full hover:from-gray-400 hover:to-gray-500 transition-all duration-300 transform hover:scale-105 hover:shadow-lg active:scale-95"
-          >
-            Back to Dashboard
-          </button>
-        </div>
-        <form onSubmit={handleAddTask} className="mb-8 bg-white p-6 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-2xl hover:shadow-purple-200">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 mb-6">
+          {project.name}
+        </h1>
+
+        {/* Add Task Form */}
+        <form onSubmit={handleAddTask} className="bg-white bg-opacity-20 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-6">
+          <div className="mb-4">
+            <label className="block text-white text-sm font-bold mb-2" htmlFor="title">
+              Task Title
+            </label>
             <input
               type="text"
-              placeholder="Task Title"
-              value={newTask.title}
-              onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-              className="p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50 transition-all duration-300 hover:border-purple-400"
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full p-3 rounded-lg bg-white bg-opacity-50 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+              placeholder="Enter task title"
               required
             />
-            <input
-              type="text"
-              placeholder="Task Description"
-              value={newTask.description}
-              onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-              className="p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50 transition-all duration-300 hover:border-purple-400"
+          </div>
+          <div className="mb-4">
+            <label className="block text-white text-sm font-bold mb-2" htmlFor="description">
+              Description
+            </label>
+            <textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full p-3 rounded-lg bg-white bg-opacity-50 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+              placeholder="Enter task description"
               required
             />
+          </div>
+          <div className="mb-4">
+            <label className="block text-white text-sm font-bold mb-2" htmlFor="status">
+              Status
+            </label>
             <select
-              value={newTask.status}
-              onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
-              className="p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50 transition-all duration-300 hover:border-purple-400"
+              id="status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="w-full p-3 rounded-lg bg-white bg-opacity-50 text-black focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
             >
               <option value="todo">To Do</option>
               <option value="inprogress">In Progress</option>
@@ -90,19 +107,16 @@ const Project = () => {
           </div>
           <button
             type="submit"
-            className="w-full p-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full hover:from-blue-500 hover:to-purple-500 transition-all duration-300 transform hover:scale-105 hover:shadow-lg active:scale-95"
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white p-3 rounded-lg hover:from-blue-600 hover:to-purple-600 hover:scale-105 hover:shadow-lg transition-all duration-300"
           >
             Add Task
           </button>
         </form>
+
+        {/* Task List */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {project.tasks.map((task) => (
-            <TaskCard
-              key={task._id}
-              task={task}
-              projectId={id}
-              setProject={setProject}
-            />
+            <TaskCard key={task._id} task={task} project={project} setProject={setProject} />
           ))}
         </div>
       </div>

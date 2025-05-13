@@ -1,25 +1,33 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import DeleteConfirmModal from './DeleteConfirmModal';
 import { toast } from 'react-toastify';
 
-const TaskCard = ({ task, projectId, setProject }) => {
+const TaskCard = ({ task, project, setProject }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTask, setEditedTask] = useState({ ...task });
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [updatedTask, setUpdatedTask] = useState({
+    title: task.title,
+    description: task.description,
+    status: task.status,
+  });
 
-  const handleUpdate = async () => {
+  // Use Vite environment variable for API URL
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  const token = localStorage.getItem('token');
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
       const res = await axios.put(
-        `http://localhost:5000/api/projects/${projectId}/tasks/${task._id}`,
-        editedTask,
-        { headers: { Authorization: `Bearer ${token}` } }
+        `${API_URL}/api/projects/${project._id}/tasks/${task._id}`,
+        updatedTask,
+        { headers }
       );
-      setProject((prev) => ({
-        ...prev,
-        tasks: prev.tasks.map((t) => (t._id === task._id ? res.data : t)),
-      }));
+      setProject({
+        ...project,
+        tasks: project.tasks.map((t) => (t._id === task._id ? res.data : t)),
+      });
       setIsEditing(false);
       toast.success('Task updated successfully!');
     } catch (err) {
@@ -28,98 +36,85 @@ const TaskCard = ({ task, projectId, setProject }) => {
     }
   };
 
-  const handleDelete = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      await axios.delete(
-        `http://localhost:5000/api/projects/${projectId}/tasks/${task._id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setProject((prev) => ({
-        ...prev,
-        tasks: prev.tasks.filter((t) => t._id !== task._id),
-      }));
-      setIsModalOpen(false);
-      toast.success('Task deleted successfully!');
-    } catch (err) {
-      console.error('Delete task error:', err);
-      toast.error('Failed to delete task');
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'todo':
+        return 'bg-blue-500';
+      case 'inprogress':
+        return 'bg-yellow-500';
+      case 'completed':
+        return 'bg-green-500';
+      default:
+        return 'bg-gray-500';
     }
   };
 
   return (
-    <>
-      <div className="task-card border-2 border-transparent hover:border-gradient-to-r hover:from-blue-400 hover:to-purple-400 transform transition-all duration-300 hover:shadow-2xl hover:shadow-purple-200 hover:scale-105">
-        {isEditing ? (
-          <div className="space-y-4">
+    <div className="bg-white bg-opacity-20 backdrop-blur-lg p-4 rounded-lg shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-gradient-to-r hover:from-blue-500 hover:to-purple-500">
+      {isEditing ? (
+        <form onSubmit={handleUpdate}>
+          <div className="mb-3">
             <input
               type="text"
-              value={editedTask.title}
-              onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
-              className="w-full p-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50 transition-all duration-300 hover:border-purple-400"
+              value={updatedTask.title}
+              onChange={(e) => setUpdatedTask({ ...updatedTask, title: e.target.value })}
+              className="w-full p-2 rounded-lg bg-white bg-opacity-50 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+              required
             />
+          </div>
+          <div className="mb-3">
             <textarea
-              value={editedTask.description}
-              onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50 transition-all duration-300 hover:border-purple-400"
+              value={updatedTask.description}
+              onChange={(e) => setUpdatedTask({ ...updatedTask, description: e.target.value })}
+              className="w-full p-2 rounded-lg bg-white bg-opacity-50 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+              required
             />
+          </div>
+          <div className="mb-3">
             <select
-              value={editedTask.status}
-              onChange={(e) => setEditedTask({ ...editedTask, status: e.target.value })}
-              className="w-full p-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50 transition-all duration-300 hover:border-purple-400"
+              value={updatedTask.status}
+              onChange={(e) => setUpdatedTask({ ...updatedTask, status: e.target.value })}
+              className="w-full p-2 rounded-lg bg-white bg-opacity-50 text-black focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
             >
               <option value="todo">To Do</option>
               <option value="inprogress">In Progress</option>
               <option value="completed">Completed</option>
             </select>
-            <div className="flex space-x-2">
-              <button
-                onClick={handleUpdate}
-                className="flex-1 bg-gradient-to-r from-green-500 to-teal-500 text-white px-4 py-2 rounded-full hover:from-green-400 hover:to-teal-400 transition-all duration-300 transform hover:scale-105 hover:shadow-lg active:scale-95"
-              >
-                Save
-              </button>
-              <button
-                onClick={() => setIsEditing(false)}
-                className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-2 rounded-full hover:from-gray-400 hover:to-gray-500 transition-all duration-300 transform hover:scale-105 hover:shadow-lg active:scale-95"
-              >
-                Cancel
-              </button>
-            </div>
           </div>
-        ) : (
-          <div>
-            <h3 className="text-lg font-semibold text-purple-700">{task.title}</h3>
-            <p className="text-gray-600">{task.description}</p>
-            <span
-              className={`status-${task.status} mt-2 inline-block transition-all duration-300 hover:scale-105`}
+          <div className="flex space-x-2">
+            <button
+              type="submit"
+              className="bg-gradient-to-r from-green-500 to-teal-500 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-teal-600 hover:scale-105 hover:shadow-lg transition-all duration-300"
             >
-              {task.status === 'todo' ? 'To Do' : task.status === 'inprogress' ? 'In Progress' : 'Completed'}
-            </span>
-            <div className="mt-4 flex space-x-2">
-              <button
-                onClick={() => setIsEditing(true)}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full hover:from-blue-500 hover:to-purple-500 transition-all duration-300 transform hover:scale-105 hover:shadow-lg active:scale-95"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-full hover:from-red-400 hover:to-pink-400 transition-all duration-300 transform hover:scale-105 hover:shadow-lg active:scale-95"
-              >
-                Delete
-              </button>
-            </div>
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 hover:scale-105 hover:shadow-lg transition-all duration-300"
+            >
+              Cancel
+            </button>
           </div>
-        )}
-      </div>
-      {isModalOpen && (
-        <DeleteConfirmModal
-          onConfirm={handleDelete}
-          onCancel={() => setIsModalOpen(false)}
-        />
+        </form>
+      ) : (
+        <div>
+          <h3 className="text-lg font-semibold text-purple-300">{task.title}</h3>
+          <p className="text-white mt-2">{task.description}</p>
+          <span
+            className={`inline-block mt-2 px-3 py-1 rounded-full text-white text-sm ${getStatusColor(task.status)}`}
+          >
+            {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+          </span>
+          <button
+            onClick={() => setIsEditing(true)}
+            className="mt-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-purple-600 hover:scale-105 hover:shadow-lg transition-all duration-300"
+          >
+            Edit
+          </button>
+        </div>
       )}
-    </>
+    </div>
   );
 };
 
