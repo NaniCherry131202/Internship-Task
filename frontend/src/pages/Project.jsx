@@ -12,9 +12,7 @@ const Project = () => {
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('todo');
 
-  // Use Vite environment variable for API URL
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -55,14 +53,14 @@ const Project = () => {
   if (!project) return <div className="text-center text-white">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-6">
+    <div className="min-h-screen bg-gray-900 p-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 mb-6">
+        <h1 className="text-3xl font-bold text-white mb-6">
           {project.name}
         </h1>
 
         {/* Add Task Form */}
-        <form onSubmit={handleAddTask} className="bg-white bg-opacity-20 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-6">
+        <form onSubmit={handleAddTask} className="bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
           <div className="mb-4">
             <label className="block text-white text-sm font-bold mb-2" htmlFor="title">
               Task Title
@@ -72,7 +70,7 @@ const Project = () => {
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full p-3 rounded-lg bg-white bg-opacity-50 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+              className="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
               placeholder="Enter task title"
               required
             />
@@ -85,7 +83,7 @@ const Project = () => {
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-3 rounded-lg bg-white bg-opacity-50 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+              className="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
               placeholder="Enter task description"
               required
             />
@@ -98,7 +96,7 @@ const Project = () => {
               id="status"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="w-full p-3 rounded-lg bg-white bg-opacity-50 text-black focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+              className="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
             >
               <option value="todo">To Do</option>
               <option value="inprogress">In Progress</option>
@@ -107,7 +105,7 @@ const Project = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white p-3 rounded-lg hover:from-blue-600 hover:to-purple-600 hover:scale-105 hover:shadow-lg transition-all duration-300"
+            className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 hover:scale-105 hover:shadow-lg transition-all duration-300"
           >
             Add Task
           </button>

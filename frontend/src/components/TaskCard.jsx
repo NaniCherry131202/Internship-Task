@@ -10,9 +10,7 @@ const TaskCard = ({ task, project, setProject }) => {
     status: task.status,
   });
 
-  // Use Vite environment variable for API URL
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
   const token = localStorage.getItem('token');
 
   const handleUpdate = async (e) => {
@@ -50,7 +48,7 @@ const TaskCard = ({ task, project, setProject }) => {
   };
 
   return (
-    <div className="bg-white bg-opacity-20 backdrop-blur-lg p-4 rounded-lg shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-gradient-to-r hover:from-blue-500 hover:to-purple-500">
+    <div className="bg-gray-800 p-4 rounded-lg shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-blue-500">
       {isEditing ? (
         <form onSubmit={handleUpdate}>
           <div className="mb-3">
@@ -58,7 +56,7 @@ const TaskCard = ({ task, project, setProject }) => {
               type="text"
               value={updatedTask.title}
               onChange={(e) => setUpdatedTask({ ...updatedTask, title: e.target.value })}
-              className="w-full p-2 rounded-lg bg-white bg-opacity-50 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+              className="w-full p-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
               required
             />
           </div>
@@ -66,7 +64,7 @@ const TaskCard = ({ task, project, setProject }) => {
             <textarea
               value={updatedTask.description}
               onChange={(e) => setUpdatedTask({ ...updatedTask, description: e.target.value })}
-              className="w-full p-2 rounded-lg bg-white bg-opacity-50 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+              className="w-full p-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
               required
             />
           </div>
@@ -74,7 +72,7 @@ const TaskCard = ({ task, project, setProject }) => {
             <select
               value={updatedTask.status}
               onChange={(e) => setUpdatedTask({ ...updatedTask, status: e.target.value })}
-              className="w-full p-2 rounded-lg bg-white bg-opacity-50 text-black focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+              className="w-full p-2 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
             >
               <option value="todo">To Do</option>
               <option value="inprogress">In Progress</option>
@@ -84,7 +82,7 @@ const TaskCard = ({ task, project, setProject }) => {
           <div className="flex space-x-2">
             <button
               type="submit"
-              className="bg-gradient-to-r from-green-500 to-teal-500 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-teal-600 hover:scale-105 hover:shadow-lg transition-all duration-300"
+              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 hover:scale-105 hover:shadow-lg transition-all duration-300"
             >
               Save
             </button>
@@ -99,8 +97,8 @@ const TaskCard = ({ task, project, setProject }) => {
         </form>
       ) : (
         <div>
-          <h3 className="text-lg font-semibold text-purple-300">{task.title}</h3>
-          <p className="text-white mt-2">{task.description}</p>
+          <h3 className="text-lg font-semibold text-white">{task.title}</h3>
+          <p className="text-gray-300 mt-2">{task.description}</p>
           <span
             className={`inline-block mt-2 px-3 py-1 rounded-full text-white text-sm ${getStatusColor(task.status)}`}
           >
@@ -108,7 +106,7 @@ const TaskCard = ({ task, project, setProject }) => {
           </span>
           <button
             onClick={() => setIsEditing(true)}
-            className="mt-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-purple-600 hover:scale-105 hover:shadow-lg transition-all duration-300"
+            className="mt-3 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 hover:scale-105 hover:shadow-lg transition-all duration-300"
           >
             Edit
           </button>
