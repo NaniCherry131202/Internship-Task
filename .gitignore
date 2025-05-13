@@ -1,0 +1,27 @@
+# === GLOBAL IGNORES ===
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# === BACKEND ===
+backend/node_modules/
+backend/.env
+
+# === FRONTEND ===
+frontend/node_modules/
+frontend/dist/  # For Vite build output
+frontend/.env
+frontend/.env.*.local
+
+# Test coverage
+coverage/
+**/coverage/

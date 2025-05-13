@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.navbar {
+  background: linear-gradient(to right, #4f46e5, #7c3aed);
+}
+
+.status-todo {
+  @apply bg-blue-500 text-white px-2 py-1 rounded-full text-sm;
+}
+
+.status-inprogress {
+  @apply bg-yellow-500 text-white px-2 py-1 rounded-full text-sm;
+}
+
+.status-completed {
+  @apply bg-green-500 text-white px-2 py-1 rounded-full text-sm;
+}
+
+.task-card {
+  @apply bg-white p-4 rounded-lg shadow-md;
+}
+
+.delete-modal {
+  @apply max-w-sm w-full;
+}
